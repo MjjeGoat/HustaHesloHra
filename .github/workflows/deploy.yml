@@ -3,40 +3,32 @@
 on:
   push:
     branches:
-      - main   # nebo hlavní branch tvého repozitáře
-  workflow_dispatch:      # umožní manuální spuštění
+      - main
 
 jobs:
-  # -----------------------------
-  # JOB 1: Build
-  # -----------------------------
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Pokud máš Node projekt, build krok by mohl vypadat takto:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # verze Node.js
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
 
       - name: Build project
-        run: npm run build   # přizpůsob podle tvého buildu
+        run: npm run build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
-          path: build/       # složka s výsledkem buildu
+          path: build/
 
-  # -----------------------------
-  # JOB 2: Deploy
-  # -----------------------------
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -48,15 +40,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-          path: build/
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
